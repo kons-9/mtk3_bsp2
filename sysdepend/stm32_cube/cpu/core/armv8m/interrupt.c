@@ -23,6 +23,8 @@
 #include "sysdepend.h"
 #include "cpu_status.h"
 
+extern volatile UW uai_systick_count;
+
 /* HLL Interrupt Handler Table */
 LOCAL UW hllint_tbl[sN_INTVEC];
 
@@ -51,6 +53,7 @@ EXPORT void knl_hll_inthdr(void)
  */
 EXPORT void knl_systim_inthdr(void)
 {
+	uai_systick_count++;
 	ENTER_TASK_INDEPENDENT;
 
 	knl_timer_handler();

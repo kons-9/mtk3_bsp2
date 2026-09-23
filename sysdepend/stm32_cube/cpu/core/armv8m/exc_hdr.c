@@ -30,6 +30,23 @@
 	#define EXCEPTION_DBG_MSG(a)
 #endif
 
+#if (USE_EXCEPTION_DBG_MSG && USE_TMONITOR)
+static void knl_dump_fault(const char *name)
+{
+	_UW icsr = *(_UW *)0xE000ED04U;
+	_UW vtor = *(_UW *)0xE000ED08U;
+	_UW cfsr = *(_UW *)SCB_CFSR;
+	_UW hfsr = *(_UW *)SCB_HFSR;
+	_UW shcsr = *(_UW *)0xE000ED24U;
+	_UW mmfar = *(_UW *)0xE000ED34U;
+	_UW bfar = *(_UW *)0xE000ED38U;
+	_UW ccr = *(_UW *)0xE000ED14U;
+
+	tm_printf((UB *)"*** %s *** ICSR:%x VTOR:%x SHCSR:%x CFSR:%x HFSR:%x MMFAR:%x BFAR:%x CCR:%x\n",
+			  name, icsr, vtor, shcsr, cfsr, hfsr, mmfar, bfar, ccr);
+}
+#endif
+
 /*
  * NMI handler
  */
@@ -47,22 +64,16 @@ void knl_hardfault_handler(void)
 {
 #if (USE_EXCEPTION_DBG_MSG  && USE_TMONITOR)
 
-	UW	hfsr, cfsr;
 	ID	ctskid;
 
-	hfsr	= *(_UW *)SCB_HFSR;
 	if(knl_ctxtsk != NULL) {
 		ctskid = knl_ctxtsk->tskid;
 	} else {
 		ctskid = 0;
 	}
 
-	if(hfsr & 0x40000000) {
-		cfsr = *(_UW*)SCB_CFSR;
-		tm_printf((UB*)"*** Hard fault ***  ctxtsk:%d  HFSR:%x  CFSR:%x\n", ctskid, hfsr, cfsr);
-	} else {
-		tm_printf((UB*)"*** Hard fault ***  ctxtsk:%d  HFSR:%x%x\n", ctskid, hfsr);
-	}
+	tm_printf((UB*)"*** Hard fault *** ctxtsk:%d\n", ctskid);
+	knl_dump_fault("Hard fault");
 #endif
 	while(1);
 }
@@ -72,6 +83,9 @@ void knl_hardfault_handler(void)
  */
 WEAK_FUNC EXPORT void knl_memmanage_handler(void)
 {
+	#if (USE_EXCEPTION_DBG_MSG && USE_TMONITOR)
+	knl_dump_fault("MPU Fault");
+	#endif
 	EXCEPTION_DBG_MSG("MPU Fault\n");
 	while(1);
 }
@@ -81,6 +95,9 @@ WEAK_FUNC EXPORT void knl_memmanage_handler(void)
  */
 WEAK_FUNC EXPORT void knl_busfault_handler(void)
 {
+	#if (USE_EXCEPTION_DBG_MSG && USE_TMONITOR)
+	knl_dump_fault("Bus Fault");
+	#endif
 	EXCEPTION_DBG_MSG("Bus Fault\n");
 	while(1);
 }
@@ -91,6 +108,9 @@ WEAK_FUNC EXPORT void knl_busfault_handler(void)
 //WEAK_FUNC EXPORT void knl_usagefault_handler(void)
 EXPORT void knl_usagefault_handler(void)
 {
+	#if (USE_EXCEPTION_DBG_MSG && USE_TMONITOR)
+	knl_dump_fault("Usage Fault");
+	#endif
 	EXCEPTION_DBG_MSG("Usage Fault\n");
 	while(1);
 }
