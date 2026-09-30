@@ -33,7 +33,7 @@
 #define CNF_MAX_SEMID		16	/* Semaphore */
 #define CNF_MAX_FLGID		16	/* Event flag */
 #define CNF_MAX_MBXID		8	/* Mailbox*/
-#define CNF_MAX_MTXID		4	/* Mutex */
+#define CNF_MAX_MTXID		8	/* Mutex */
 #define CNF_MAX_MBFID		8	/* Message buffer */
 #define CNF_MAX_MPLID		4	/* Memory pool */
 #define CNF_MAX_MPFID		8	/* Fixed size memory pool */
@@ -110,7 +110,24 @@
 /* Debugger support function
  *   1: Valid  0: Invalid
  */
+/*
+ * Execution trace hooks are deliberately disabled in the normal image.
+ * Set USE_DBGSPT_TRACE to 1 (or pass UAI_KERNEL_TRACE_HOOKS=ON to CMake)
+ * for the tracing build.  The latter also enables the mT-Kernel/DS support
+ * required by the td_hok_* APIs.
+ */
+#ifndef USE_DBGSPT_TRACE
+#define USE_DBGSPT_TRACE		(0)	/* Use execution trace hooks */
+#endif
+
+#ifndef USE_DBGSPT
 #define USE_DBGSPT		(0)	/* Use mT-Kernel/DS */
+#endif
+
+#if USE_DBGSPT_TRACE
+#undef USE_DBGSPT
+#define USE_DBGSPT		(1)
+#endif
 #define USE_OBJECT_NAME		(0)	/* Use DS object name */
 
 #define OBJECT_NAME_LENGTH	(8)	/* DS Object name length */

@@ -158,6 +158,16 @@ l_dispatch_110:
 l_dispatch_120:			// Switch to 'schedtsk'
 	str	r8, [r4]			// ctxtsk = schedtsk
 
+#if USE_DBGSPT_TRACE
+	/*
+	 * The dispatcher is still locked here and ctxtsk already names the
+	 * incoming task.  r1 is the outgoing TCB (or NULL on first dispatch).
+	 */
+	mov	r0, r1
+	mov	r1, r8
+	bl	Csym(knl_dispatch_hook)
+#endif
+
 #if USE_SPMON
 	ldr	r2, =INTERNAL_RAM_START
 	msr	msplim, r2

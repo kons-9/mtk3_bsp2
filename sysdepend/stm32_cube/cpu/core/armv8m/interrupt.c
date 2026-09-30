@@ -28,6 +28,11 @@ extern volatile UW uai_systick_count;
 /* HLL Interrupt Handler Table */
 LOCAL UW hllint_tbl[sN_INTVEC];
 
+#if USE_DBGSPT_TRACE
+IMPORT void knl_trace_int_enter(UINT intno);
+IMPORT void knl_trace_int_leave(UINT intno);
+#endif
+
 /* ------------------------------------------------------------------------ */
 /*
  * HLL(High level programming language) Interrupt Handler
@@ -42,7 +47,13 @@ EXPORT void knl_hll_inthdr(void)
 	intno	= knl_get_ipsr() - 16;
 	inthdr	= (FP)hllint_tbl[intno];
 
+	#if USE_DBGSPT_TRACE
+	knl_trace_int_enter(intno);
+	#endif
 	(*inthdr)(intno);
+	#if USE_DBGSPT_TRACE
+	knl_trace_int_leave(intno);
+	#endif
 
 	LEAVE_TASK_INDEPENDENT;
 }
