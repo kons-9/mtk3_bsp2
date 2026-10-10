@@ -33,7 +33,7 @@
 #define CNF_MAX_SEMID		16	/* Semaphore */
 #define CNF_MAX_FLGID		16	/* Event flag */
 #define CNF_MAX_MBXID		8	/* Mailbox*/
-#define CNF_MAX_MTXID		8	/* Mutex */
+#define CNF_MAX_MTXID		16	/* Mutex */
 #define CNF_MAX_MBFID		8	/* Message buffer */
 #define CNF_MAX_MPLID		4	/* Memory pool */
 #define CNF_MAX_MPFID		8	/* Fixed size memory pool */
